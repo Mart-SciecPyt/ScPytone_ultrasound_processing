@@ -4,7 +4,6 @@ Ultrasound Processing Package
 **ultrasound_processing_package** is a Python toolbox designed for the purpose of preprocessing and transformation of ultrasound images. It provides three core capabilities: Convert curved ultrasound scans into flat images, Filtering the contour of a selected object by intensity thresholding, Convert back to curved ultrasound scans. The transformations are essential for the thresholding so we can search for peaks using cartesian coordinates instead of polar coordinates. These modules will be the fundamentals of point cloud generation based on ultrasound images.
 
 
-
 Description
 ===========
 
@@ -13,12 +12,10 @@ Description
 
 In this module we are preprocessing the image and we transform it to a “flat” format which is easier to work with at the filtering part. We convert the input image to grayscale and detect centimeter calibration marks along both axes. The image is then cleaned by removing irrelevant top and side regions and suppressing extreme pixel values. Based on peak detection, the module estimates the geometric parameters of the scan area and transducer settings, such as the offset and scanning depth. Using trigonometric relations, it constructs a polar-to-Cartesian grid. We use trilinear interpolation to project the image onto a uniform Cartesian space for the filtering part.
 
-
 2. Filtering of the Ultrasound Images
 -------------------------------------
 
 In this module, we first generate a binary mask by thresholding the input image: pixels with intensity at or above the specified threshold are set to white (255), and those below are set to black (0). After removing noise components, we scan each column to select the very first pixel whose intensity exceeds the threshold, building an initial contour mask. Next, we apply OpenCV’s functions to thicken that contour for clear visualization. Finally, we apply the dilated contour as a mask to preserve and display the original pixel intensities. 
-
 
 3. Backtransformation
 ---------------------
@@ -39,8 +36,7 @@ Navigate to the directory and install with pip
 
 .. code-block:: bash
 
-   pip install ultrasound_processing_package
-
+   pip install ultrasound_processing
 Make sure to set the proper paths to the files.
 
 2. Example
@@ -54,7 +50,7 @@ Make sure to set the proper paths to the files.
 Transform Project Module
 ========================
 
-This module transforms a grayscale ultrasound image from polar-like geometry into a clean Cartesian projection using calibration marks and interpolation.
+This module transforms a grayscale ultrasound image from polar-like geometry into a clean Cartesian projection using trilinear interpolation.
 
 Steps
 =====
@@ -84,7 +80,7 @@ Function Descriptions
 convert_to_grayscale(image)
 ---------------------------
 
-Converts a color image to grayscale using the PIL library.
+Converts a color image to grayscale.
 
 Parameters
 ^^^^^^^^^^
@@ -100,7 +96,7 @@ Returns
 detect_cm_marks(gray_array)
 ---------------------------
 
-Detects calibration marks (e.g. ruler ticks) on the image edges and calculates the scale.
+Detects calibration marks (ruler ticks) on the image edges and calculates the scale.
 
 Parameters
 ^^^^^^^^^^
@@ -205,8 +201,8 @@ Parameters
 ^^^^^^^^^^
 
 :``path``: ``str``  
-:``alpha_deg``: ``float`` — field-of-view angle in degrees  
-:``res``: ``float`` — resolution in pixels/cm  
+:``alpha_deg``: ``float`` 
+:``res``: ``float`` 
 
 Returns
 ^^^^^^^
@@ -258,13 +254,13 @@ Returns
 Transform Back Project Module
 =============================
 
-This module transforms polar ultrasound-like images into Cartesian form using geometric mapping and interpolation techniques.
+This module transforms polar ultrasound-like images into Cartesian form using trilinear interpolation.
 
 Steps
 =====
 
 #. **Load grayscale data**
-#. **Convert between polar and Cartesian coordinates**
+#. **Convert from polar to Cartesian coordinates**
 #. **Build a grid over the Cartesian space**
 #. **Filter valid regions**
 #. **Interpolate pixel intensities**
@@ -272,8 +268,7 @@ Steps
 Functions and Classes
 ---------------------
 
-.. autofunction:: read_png
-.. autofunction:: read_png_colored
+
 .. autoclass:: VolumeTransformer
 	:members:
 .. autofunction:: interp
@@ -282,38 +277,6 @@ Functions and Classes
 
 Function Descriptions
 ---------------------
-
-read_png(path)
---------------
-
-Reads a PNG image using matplotlib.
-
-Parameters
-^^^^^^^^^^
-
-:``path``: ``str`` — File path to PNG image  
-
-Returns
-^^^^^^^
-
-:``image``: ``ndarray``  
-
-
-read_png_colored(path)
-----------------------
-
-Reads and converts a PNG image to grayscale using weighted RGB channels.
-
-Parameters
-^^^^^^^^^^
-
-:``path``: ``str`` — File path to PNG image  
-
-Returns
-^^^^^^^
-
-:``image_gray``: ``ndarray``  
-
 
 VolumeTransformer
 -----------------
@@ -329,7 +292,7 @@ Parameters
 :``frame_depth``: ``int`` — Height of input image in pixels  
 :``depth``: ``float`` — Physical scan depth  
 :``thetas``: ``tuple[float, float]`` — Angular range in radians  
-:``offset``: ``float`` — Vertical offset from origin  
+:``offset``: ``float`` — Vertical offset from transducer origo 
 :``resolution``: ``float`` — Physical resolution (units/pixel)  
 :``straighten_volume``: ``bool`` — Whether to center the angular range (default: False)  
 
