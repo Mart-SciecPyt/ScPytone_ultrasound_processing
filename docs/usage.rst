@@ -1,15 +1,8 @@
 Ultrasound Processing Package
 =============================
 
-**ultrasound_processing_package** is a Python toolbox designed for preprocessing and transforming ultrasound images.  
-It includes three core functionalities:
+**ultrasound_processing_package** is a Python toolbox designed for the purpose of preprocessing and transformation of ultrasound images. It provides three core capabilities: Convert curved ultrasound scans into flat images, Filtering the contour of a selected object by intensity thresholding, Convert back to curved ultrasound scans. The transformations are essential for the thresholding so we can search for peaks using cartesian coordinates instead of polar coordinates. These modules will be the fundamentals of point cloud generation based on ultrasound images.
 
-- Convert curved ultrasound scans into flat images.
-- Filter the contour of a selected object by intensity thresholding.
-- Convert flat images back into curved ultrasound scans.
-
-These transformations enable precise analysis in Cartesian coordinates instead of polar geometry.  
-They form the foundation for point cloud generation from ultrasound data.
 
 
 Description
@@ -18,38 +11,19 @@ Description
 1. Preprocessing and Transforming Images
 ----------------------------------------
 
-In this module, we preprocess the image and convert it into a “flat” format, which is easier to work with during filtering.
-
-- Convert the input image to grayscale.
-- Detect and interpret calibration marks along both axes.
-- Clean the image by removing irrelevant regions and suppressing extreme pixel values.
-- Estimate geometric parameters (e.g., scan area, offset, scanning depth) based on peak detection.
-- Use trigonometric relations to build a polar-to-Cartesian coordinate grid.
-- Use trilinear interpolation to project the image onto a uniform Cartesian plane.
+In this module we are preprocessing the image and we transform it to a “flat” format which is easier to work with at the filtering part. We convert the input image to grayscale and detect centimeter calibration marks along both axes. The image is then cleaned by removing irrelevant top and side regions and suppressing extreme pixel values. Based on peak detection, the module estimates the geometric parameters of the scan area and transducer settings, such as the offset and scanning depth. Using trigonometric relations, it constructs a polar-to-Cartesian grid. We use trilinear interpolation to project the image onto a uniform Cartesian space for the filtering part.
 
 
 2. Filtering of the Ultrasound Images
 -------------------------------------
 
-In this module, we filter the image using thresholding:
-
-- Pixels with intensity above a threshold are set to white (255), others to black (0).
-- Noise is removed using morphological operations.
-- For each column, we keep the first pixel exceeding the threshold to define a contour.
-- The contour is dilated using OpenCV functions for clarity.
-- A mask is created using the dilated contour and applied to the original image to preserve useful intensity data.
+In this module, we first generate a binary mask by thresholding the input image: pixels with intensity at or above the specified threshold are set to white (255), and those below are set to black (0). After removing noise components, we scan each column to select the very first pixel whose intensity exceeds the threshold, building an initial contour mask. Next, we apply OpenCV’s functions to thicken that contour for clear visualization. Finally, we apply the dilated contour as a mask to preserve and display the original pixel intensities. 
 
 
 3. Backtransformation
 ---------------------
 
-This module reverses the transformation process:
-
-- Converts Cartesian space data back to polar geometry.
-- Defines key transformation parameters and builds a polar grid.
-- Excludes regions outside the field of view.
-- Finds nearest matching coordinates from the original data.
-- Uses trilinear interpolation to fill in the backprojected image based on original data and weights.
+In this module we define a class to reverse the transformation process, converting polar image data back into Cartesian coordinates. It first initializes key transformation parameters and builds a 3D volume grid using spherical coordinates. The grid is filtered to exclude regions outside the cone of interest. It finds the nearest original coordinates for each point and assigns interpolation weights. The main function performs trilinear interpolation to fill in the back-projected image using these weights.
 
 
 Usage
@@ -60,10 +34,11 @@ Usage
 
 To install:
 
+Clone the git repository, or download the code
+Navigate to the directory and install with pip
+
 .. code-block:: bash
 
-   git clone <repository-url>
-   cd ultrasound_processing_package
    pip install ultrasound_processing_package
 
 Make sure to set the proper paths to the files.
@@ -71,7 +46,6 @@ Make sure to set the proper paths to the files.
 2. Example
 ----------
 
-Martín could you please write a working example for the package here?
 
 *Hyperlinked notebook:*  
 `Notebook link <https://colab.research.google.com/drive/1X5UvAwVgtOkaNmMB3ywh5hn7X8JztSir?usp=sharing>`_
