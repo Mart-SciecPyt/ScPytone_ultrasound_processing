@@ -6,21 +6,20 @@ setup(
     packages=find_packages(),
     install_requires=[
         "numpy",
-        "opencv-python",
         "matplotlib",
+        "opencv-python",
         "Pillow",
-        "scipy"
+        "scipy",
     ],
-    author="Your Name",
-    author_email="your.email@example.com",
-    description="A package for ultrasound image transformation and processing",
+    author="Tied a név",
+    description="Ultrasound image processing package including masking and transformations.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/ultrasound_processing_package",
+    url="https://github.com/Mart-SciecPyt/ScPytone_ultrasound_processing",  # Ha másik, akkor cseréld
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.7",
+    python_requires='>=3.7',
 )

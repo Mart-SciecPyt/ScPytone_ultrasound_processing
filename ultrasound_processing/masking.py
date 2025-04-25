@@ -1,19 +1,13 @@
 import cv2
 import numpy as np
 
-def remove_top_noise_and_keep_first_white(image_input, top_percent=0.90, top_margin=5, apply_closing=True):
-    if isinstance(image_input, str):
-        image = cv2.imread(image_input, cv2.IMREAD_GRAYSCALE)
-        if image is None:
-            raise IOError(f"Failed to load the image: {image_input}")
-    elif isinstance(image_input, np.ndarray):
-        image = image_input
-    else:
-        raise ValueError("image_input must be a file path or numpy array.")
+#def remove_top_noise_and_keep_first_white(image, top_percent=0.90, top_margin=5, apply_closing=True):#image_path, top_percent=0.90, top_margin=5, apply_closing=True):
+def mask(image, top_percent=0.93, top_margin=5, apply_closing=True):#image_path, top_percent=0.90, top_margin=5, apply_closing=True):
 
-    hist, _ = np.histogram(image.flatten(), bins=256, range=[0, 256])
+    hist, bins = np.histogram(image.flatten(), bins=256, range=[0, 256])
     cdf = hist.cumsum()
     cdf_normalized = cdf / float(cdf[-1])
+
     threshold_idx = np.where(cdf_normalized >= top_percent)[0]
     threshold_value = threshold_idx[0] if threshold_idx.size > 0 else 255
 
@@ -24,6 +18,7 @@ def remove_top_noise_and_keep_first_white(image_input, top_percent=0.90, top_mar
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
 
     num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
+
     for i in range(1, num_labels):
         if stats[i][1] < top_margin:
             mask[labels == i] = 0
@@ -42,4 +37,4 @@ def remove_top_noise_and_keep_first_white(image_input, top_percent=0.90, top_mar
     smooth_mask_normalized = smooth_mask.astype(np.float32) / 255.0
     masked_image = (image.astype(np.float32) * smooth_mask_normalized).astype(np.uint8)
 
-    return image, threshold_value, smooth_mask, masked_image
+    return masked_image#image, threshold_value, smooth_mask, masked_image
