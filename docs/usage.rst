@@ -36,7 +36,7 @@ Navigate to the directory and install with pip
 
 .. code-block:: bash
 
-   pip install ultrasound_processing
+pip install ultrasound-processing
 Make sure to set the proper paths to the files.
 
 2. Example
@@ -45,6 +45,9 @@ Make sure to set the proper paths to the files.
 
 *Hyperlinked notebook:*  
 `Notebook link <https://colab.research.google.com/drive/1X5UvAwVgtOkaNmMB3ywh5hn7X8JztSir?usp=sharing>`_
+
+* Github repository link:*
+<https://github.com/Mart-SciecPyt/ScPytone_ultrasound_processing>
 
 
 Transform Project Module
