@@ -1,0 +1,280 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Masking &mdash; Ultrasound Processing  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Backtransformation" href="transform_back.html" />
+    <link rel="prev" title="Transformation" href="transform.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ultrasound Processing
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="transform.html">Transformation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Masking</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.masking.mask"><code class="docutils literal notranslate"><span class="pre">mask()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.masking.compute_threshold"><code class="docutils literal notranslate"><span class="pre">compute_threshold()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.masking.threshold_mask"><code class="docutils literal notranslate"><span class="pre">threshold_mask()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.masking.do_closing"><code class="docutils literal notranslate"><span class="pre">do_closing()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.masking.remove_small_components"><code class="docutils literal notranslate"><span class="pre">remove_small_components()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.masking.extract_top_contour"><code class="docutils literal notranslate"><span class="pre">extract_top_contour()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.masking.dilate_contour"><code class="docutils literal notranslate"><span class="pre">dilate_contour()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.masking.smooth_mask"><code class="docutils literal notranslate"><span class="pre">smooth_mask()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.masking.original_intensity_mask"><code class="docutils literal notranslate"><span class="pre">original_intensity_mask()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="transform_back.html">Backtransformation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ultrasound Processing</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Masking</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/mask.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="masking">
+<h1>Masking<a class="headerlink" href="#masking" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.masking.mask">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.masking.</span></span><span class="sig-name descname"><span class="pre">mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_percent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.93</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_margin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_closing_flag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/ultrasound_processing/masking.html#mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.masking.mask" title="Link to this definition"></a></dt>
+<dd><p>Complete pipeline that generates a masked ultrasound image that keeps only the contour of a certain object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> – Input 2D grayscale image.</p></li>
+<li><p><strong>top_percent</strong> – Fraction of pixels to threshold as white (default 0.93).</p></li>
+<li><p><strong>top_margin</strong> – Pixel row margin to remove top noise components (default 5).</p></li>
+<li><p><strong>apply_closing_flag</strong> – Whether to perform morphological closing (default True).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A grayscale image where only the contour region retains its original intensities.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.masking.compute_threshold">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.masking.</span></span><span class="sig-name descname"><span class="pre">compute_threshold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_percent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/ultrasound_processing/masking.html#compute_threshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.masking.compute_threshold" title="Link to this definition"></a></dt>
+<dd><p>Compute the intensity threshold such that the top top_percent fraction of pixel values
+in the grayscale image will be set to white in the binary mask.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> – 2D numpy array of grayscale pixel intensities (0-255).</p></li>
+<li><p><strong>top_percent</strong> – Number between 0 and 1 that determines the fraction of pixels to be set to white.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An integer threshold value in the range [0, 255].</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.masking.threshold_mask">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.masking.</span></span><span class="sig-name descname"><span class="pre">threshold_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/ultrasound_processing/masking.html#threshold_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.masking.threshold_mask" title="Link to this definition"></a></dt>
+<dd><p>Create a binary mask by thresholding the image: pixels with intensity &gt;= threshold_value
+become 255 (white), others become 0 (black).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> – 2D numpy array of grayscale pixel intensities.</p></li>
+<li><p><strong>threshold_value</strong> – Intensity cutoff for binarization.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A binary mask as a 2D numpy array of 0s and 255s.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.masking.do_closing">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.masking.</span></span><span class="sig-name descname"><span class="pre">do_closing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(2,</span> <span class="pre">2)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/ultrasound_processing/masking.html#do_closing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.masking.do_closing" title="Link to this definition"></a></dt>
+<dd><p>Apply a morphological closing operation (dilation followed by erosion) to fill small holes
+and connect nearby white regions in the binary mask.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask</strong> – Binary mask (0 or 255) to be processed.</p></li>
+<li><p><strong>kernel_size</strong> – Size of the structuring element used for closing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mask after morphological closing.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.masking.remove_small_components">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.masking.</span></span><span class="sig-name descname"><span class="pre">remove_small_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_margin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/ultrasound_processing/masking.html#remove_small_components"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.masking.remove_small_components" title="Link to this definition"></a></dt>
+<dd><p>Remove white components (noise) from the top part of the image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask</strong> – Binary mask (0 or 255) (after closing).</p></li>
+<li><p><strong>top_margin</strong> – Number of pixels from the top; any component starting above this
+line will be removed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mask with small top components removed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.masking.extract_top_contour">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.masking.</span></span><span class="sig-name descname"><span class="pre">extract_top_contour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/ultrasound_processing/masking.html#extract_top_contour"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.masking.extract_top_contour" title="Link to this definition"></a></dt>
+<dd><p>Extract the top contour of the white regions in the binary mask by keeping only the first
+white pixel in each column.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mask</strong> – Cleaned binary mask (0 or 255).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A binary image where each column has at most one white pixel.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.masking.dilate_contour">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.masking.</span></span><span class="sig-name descname"><span class="pre">dilate_contour</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contour</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(2,</span> <span class="pre">2)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/ultrasound_processing/masking.html#dilate_contour"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.masking.dilate_contour" title="Link to this definition"></a></dt>
+<dd><p>Thicken the one- pixel-wide contour by applying dilation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>contour</strong> – Binary contour image (0 or 255) with single-pixel lines.</p></li>
+<li><p><strong>kernel_size</strong> – Size of the rectangular structuring element.</p></li>
+<li><p><strong>iterations</strong> – Number of dilation iterations.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The dilated contour mask.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.masking.smooth_mask">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.masking.</span></span><span class="sig-name descname"><span class="pre">smooth_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dilated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blur_ksize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(5,</span> <span class="pre">5)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/ultrasound_processing/masking.html#smooth_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.masking.smooth_mask" title="Link to this definition"></a></dt>
+<dd><p>Apply a Gaussian blur to the dilated contour mask.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dilated</strong> – Dilated binary contour mask.</p></li>
+<li><p><strong>blur_ksize</strong> – Kernel size for Gaussian blur.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A smooth mask with values in [0, 255].</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.masking.original_intensity_mask">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.masking.</span></span><span class="sig-name descname"><span class="pre">original_intensity_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/ultrasound_processing/masking.html#original_intensity_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.masking.original_intensity_mask" title="Link to this definition"></a></dt>
+<dd><p>Preserve the original grayscale intensities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> – Original 2D grayscale image.</p></li>
+<li><p><strong>smooth</strong> – Smooth mask with values in [0, 255].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Masked image where the contour regions preserve their original intensities.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="transform.html" class="btn btn-neutral float-left" title="Transformation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="transform_back.html" class="btn btn-neutral float-right" title="Backtransformation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

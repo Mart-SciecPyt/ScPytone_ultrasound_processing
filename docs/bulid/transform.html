@@ -1,0 +1,285 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transformation &mdash; Ultrasound Processing  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Masking" href="mask.html" />
+    <link rel="prev" title="Ultrasound Processing Package" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ultrasound Processing
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Transformation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.transform.transform_image"><code class="docutils literal notranslate"><span class="pre">transform_image()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.transform.convert_to_grayscale"><code class="docutils literal notranslate"><span class="pre">convert_to_grayscale()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.transform.detect_cm_marks"><code class="docutils literal notranslate"><span class="pre">detect_cm_marks()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.transform.clean_image"><code class="docutils literal notranslate"><span class="pre">clean_image()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.transform.calculate_geometry"><code class="docutils literal notranslate"><span class="pre">calculate_geometry()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.transform.compute_coordinate_grid"><code class="docutils literal notranslate"><span class="pre">compute_coordinate_grid()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ultrasound_processing.transform.interpolate_image"><code class="docutils literal notranslate"><span class="pre">interpolate_image()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mask.html">Masking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transform_back.html">Backtransformation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ultrasound Processing</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Transformation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/transform.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="transformation">
+<h1>Transformation<a class="headerlink" href="#transformation" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.transform.transform_image">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.transform.</span></span><span class="sig-name descname"><span class="pre">transform_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PIL.Image.Image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ultrasound_processing/transform.html#transform_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.transform.transform_image" title="Link to this definition"></a></dt>
+<dd><p>Transforms an ultrasound image into a rectified coordinate system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>PIL.Image.Image</em>) – Input image to process.</p></li>
+<li><p><strong>alpha_deg</strong> (<em>float</em>) – Half angle of the ultrasound beam in degrees.</p></li>
+<li><p><strong>res</strong> (<em>float</em>) – Image resolution scaling factor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>Transformed image as a 2D array.</p></li>
+<li><p>Depth of the ultrasound window in pixels.</p></li>
+<li><p>Offset from the top in centimeters.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, float, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.transform.convert_to_grayscale">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.transform.</span></span><span class="sig-name descname"><span class="pre">convert_to_grayscale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ultrasound_processing/transform.html#convert_to_grayscale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.transform.convert_to_grayscale" title="Link to this definition"></a></dt>
+<dd><p>Converts a PIL image to a grayscale NumPy array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image</strong> (<em>PIL.Image.Image</em>) – Input image in PIL.Image format.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Grayscale image as a 2D NumPy array.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.transform.detect_cm_marks">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.transform.</span></span><span class="sig-name descname"><span class="pre">detect_cm_marks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gray_array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ultrasound_processing/transform.html#detect_cm_marks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.transform.detect_cm_marks" title="Link to this definition"></a></dt>
+<dd><p>Detects centimeter marks in the grayscale image along rows and columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gray_array</strong> (<em>np.ndarray</em>) – Grayscale image array.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>Estimated distance in pixels between cm marks (float).</p></li>
+<li><p>List of detected row indices (List[int]).</p></li>
+<li><p>List of detected column indices (List[int]).</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[float, List[int], List[int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.transform.clean_image">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.transform.</span></span><span class="sig-name descname"><span class="pre">clean_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gray_array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ultrasound_processing/transform.html#clean_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.transform.clean_image" title="Link to this definition"></a></dt>
+<dd><p>Cleans the grayscale image by cropping and filtering pixel values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gray_array</strong> (<em>np.ndarray</em>) – Grayscale image array.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>Processed image as a float array with noise filtered.</p></li>
+<li><p>Index of the first row retained after cropping.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.transform.calculate_geometry">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.transform.</span></span><span class="sig-name descname"><span class="pre">calculate_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ultrasound_processing/transform.html#calculate_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.transform.calculate_geometry" title="Link to this definition"></a></dt>
+<dd><p>Calculates geometric parameters from the ultrasound image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>temp</strong> (<em>np.ndarray</em>) – Cleaned image array.</p></li>
+<li><p><strong>d</strong> (<em>float</em>) – Pixel-to-centimeter ratio.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – Half angle of the ultrasound beam in radians.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>Depth of the offset in pixels.</p></li>
+<li><p>Height in pixels of the ultrasound window.</p></li>
+<li><p>Offset in centimeters.</p></li>
+<li><p>Height in centimeters of the ultrasound window.</p></li>
+<li><p>First row index of the window.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[float, int, float, float, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.transform.compute_coordinate_grid">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.transform.</span></span><span class="sig-name descname"><span class="pre">compute_coordinate_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset_cm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_cm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset_px</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_deg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">res</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ultrasound_processing/transform.html#compute_coordinate_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.transform.compute_coordinate_grid" title="Link to this definition"></a></dt>
+<dd><p>Computes the coordinate grid for the ultrasound image transformation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>offset_cm</strong> (<em>float</em>) – Offset in centimeters.</p></li>
+<li><p><strong>r_cm</strong> (<em>float</em>) – Range in centimeters.</p></li>
+<li><p><strong>d</strong> (<em>float</em>) – Pixel-to-centimeter ratio.</p></li>
+<li><p><strong>temp</strong> (<em>np.ndarray</em>) – Processed grayscale image.</p></li>
+<li><p><strong>offset_px</strong> (<em>float</em>) – Offset in pixels.</p></li>
+<li><p><strong>first</strong> (<em>int</em>) – Index of the first pixel row used.</p></li>
+<li><p><strong>alpha_deg</strong> (<em>float</em>) – Half angle of ultrasound beam in degrees.</p></li>
+<li><p><strong>res</strong> (<em>float</em>) – Image resolution scaling factor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>X coordinates in the transformed space.</p></li>
+<li><p>Y coordinates in the transformed space.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, np.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ultrasound_processing.transform.interpolate_image">
+<span class="sig-prename descclassname"><span class="pre">ultrasound_processing.transform.</span></span><span class="sig-name descname"><span class="pre">interpolate_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ultrasound_processing/transform.html#interpolate_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ultrasound_processing.transform.interpolate_image" title="Link to this definition"></a></dt>
+<dd><p>Applies bilinear interpolation to map intensity values from input coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – X coordinate grid.</p></li>
+<li><p><strong>Y</strong> (<em>np.ndarray</em>) – Y coordinate grid.</p></li>
+<li><p><strong>temp</strong> (<em>np.ndarray</em>) – Processed grayscale image.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Interpolated intensity values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Ultrasound Processing Package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mask.html" class="btn btn-neutral float-right" title="Masking" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

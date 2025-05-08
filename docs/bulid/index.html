@@ -1,0 +1,186 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ultrasound Processing Package &mdash; Ultrasound Processing  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Transformation" href="transform.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            Ultrasound Processing
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="transform.html">Transformation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mask.html">Masking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transform_back.html">Backtransformation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Ultrasound Processing</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Ultrasound Processing Package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ultrasound-processing-package">
+<h1>Ultrasound Processing Package<a class="headerlink" href="#ultrasound-processing-package" title="Link to this heading"></a></h1>
+<p>Ultrasound processing package is a Python toolbox designed for the purpose of
+preprocessing and transformation of ultrasound images. It provides three core
+capabilities: Convert curved ultrasound scans into flat images, Filtering the
+contour of a selected object by intensity thresholding, Convert back to curved
+ultrasound scans. The transformations are essential for the thresholding so we
+can search for peaks using Cartesian coordinates instead of polar coordinates.
+These modules will be the fundamentals of point cloud generation based on
+ultrasound images.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="transform.html">Transformation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mask.html">Masking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transform_back.html">Backtransformation</a></li>
+</ul>
+</div>
+</section>
+<section id="description">
+<h1>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h1>
+<ol class="arabic simple">
+<li><p>In this module we are preprocessing the image and we transform it to a
+“flat” format. We convert the input image to grayscale and detect
+centimeter calibration marks along both axes. The image is then cleaned
+by removing irrelevant top and side regions and outlier pixel values.
+Based on peak detection, the module estimates the geometric parameters
+of the scan area and transducer settings, such as the offset and scanning depth.
+Using trigonometric relations, it constructs a polar-to-Cartesian grid.
+We use bilinear interpolation to project the image onto a uniform Cartesian space.</p></li>
+</ol>
+<div style="margin-top:30px;"></div><ol class="arabic simple" start="2">
+<li><p>In this module, we first generate a binary mask by thresholding the input
+image: pixels with intensity at or above the specified threshold are set to
+white (255), and those below are set to black (0). After removing noise
+components, we scan each column to select the very first pixel whose
+intensity exceeds the threshold, building an initial contour mask. Next, we
+apply OpenCV’s functions to thicken that contour for clear visualization.
+Finally, we apply the dilated contour as a mask to preserve and display the
+original pixel intensities.</p></li>
+</ol>
+<div style="margin-top:30px;"></div><ol class="arabic simple" start="3">
+<li><p>In this module we reverse the transformation process,
+converting polar image data back into Cartesian coordinates. We first
+initialize key transformation parameters and build a 3D volume grid using
+spherical coordinates. The grid is filtered to exclude regions outside the
+region of interest. Using bilinear interpolation, we project back the masked
+image to the grid.</p></li>
+</ol>
+<div style="margin-top:50px;"></div><a class="reference internal image-reference" href="_images/diagram3.png"><img alt="Description for screen readers" class="align-center" src="_images/diagram3.png" style="width: 767px; height: 440px;" />
+</a>
+<div style="margin-top:70px;"></div></section>
+<section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h1>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>To install:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>ultrasound-processing
+</pre></div>
+</div>
+<p>Make sure to set the proper paths to the files.</p>
+</section>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Python 3.7 or higher</p></li>
+<li><p>NumPy</p></li>
+<li><p>OpenCV</p></li>
+<li><p>Matplotlib</p></li>
+<li><p>Scikit-image</p></li>
+<li><p>Scipy</p></li>
+</ul>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<p>Hyperlinked notebook: Example notebook <a class="reference external" href="https://github.com/Mart-SciecPyt/ScPytone_ultrasound_processing/blob/main/example.ipynb">https://github.com/Mart-SciecPyt/ScPytone_ultrasound_processing/blob/main/example.ipynb</a></p>
+<p>Github repository link:</p>
+<p><a class="reference external" href="https://github.com/Mart-SciecPyt/ScPytone_ultrasound_processing">https://github.com/Mart-SciecPyt/ScPytone_ultrasound_processing</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="transform.html" class="btn btn-neutral float-right" title="Transformation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,600 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ultrasound Processing Package &mdash; Ultrasound Processing  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ultrasound Processing
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">“Modules”</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="transform.html">Transform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mask.html">Masking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transform_back.html">Transforming back</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ultrasound Processing</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Ultrasound Processing Package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ultrasound-processing-package">
+<h1>Ultrasound Processing Package<a class="headerlink" href="#ultrasound-processing-package" title="Link to this heading"></a></h1>
+<p><strong>ultrasound_processing_package</strong> is a Python toolbox designed for the purpose of preprocessing and transformation of ultrasound images. It provides three core capabilities: Convert curved ultrasound scans into flat images, Filtering the contour of a selected object by intensity thresholding, Convert back to curved ultrasound scans. The transformations are essential for the thresholding so we can search for peaks using cartesian coordinates instead of polar coordinates. These modules will be the fundamentals of point cloud generation based on ultrasound images.</p>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h2>
+<section id="preprocessing-and-transforming-images">
+<h3>1. Preprocessing and Transforming Images<a class="headerlink" href="#preprocessing-and-transforming-images" title="Link to this heading"></a></h3>
+<p>In this module we are preprocessing the image and we transform it to a “flat” format which is easier to work with at the filtering part. We convert the input image to grayscale and detect centimeter calibration marks along both axes. The image is then cleaned by removing irrelevant top and side regions and suppressing extreme pixel values. Based on peak detection, the module estimates the geometric parameters of the scan area and transducer settings, such as the offset and scanning depth. Using trigonometric relations, it constructs a polar-to-Cartesian grid. We use trilinear interpolation to project the image onto a uniform Cartesian space for the filtering part.</p>
+</section>
+<section id="filtering-of-the-ultrasound-images">
+<h3>2. Filtering of the Ultrasound Images<a class="headerlink" href="#filtering-of-the-ultrasound-images" title="Link to this heading"></a></h3>
+<p>In this module, we first generate a binary mask by thresholding the input image: pixels with intensity at or above the specified threshold are set to white (255), and those below are set to black (0). After removing noise components, we scan each column to select the very first pixel whose intensity exceeds the threshold, building an initial contour mask. Next, we apply OpenCV’s functions to thicken that contour for clear visualization. Finally, we apply the dilated contour as a mask to preserve and display the original pixel intensities.</p>
+</section>
+<section id="backtransformation">
+<h3>3. Backtransformation<a class="headerlink" href="#backtransformation" title="Link to this heading"></a></h3>
+<p>In this module we define a class to reverse the transformation process, converting polar image data back into Cartesian coordinates. It first initializes key transformation parameters and builds a 3D volume grid using spherical coordinates. The grid is filtered to exclude regions outside the cone of interest. It finds the nearest original coordinates for each point and assigns interpolation weights. The main function performs trilinear interpolation to fill in the back-projected image using these weights.</p>
+</section>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
+<section id="installation">
+<h3>1. Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h3>
+<p>To install:</p>
+<p>Clone the git repository, or download the code
+Navigate to the directory and install with pip</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<p>pip install ultrasound-processing
+Make sure to set the proper paths to the files.</p>
+</section>
+<section id="example">
+<h3>2. Example<a class="headerlink" href="#example" title="Link to this heading"></a></h3>
+<p><em>Hyperlinked notebook:</em>
+<a class="reference external" href="https://colab.research.google.com/drive/1kBXFLoUOBfgKEE54D0almOjun8gcgtpZ?usp=sharing">Notebook link</a></p>
+<ul class="simple">
+<li><p>Github repository link:*</p></li>
+</ul>
+<p>&lt;<a class="reference external" href="https://github.com/Mart-SciecPyt/ScPytone_ultrasound_processing">https://github.com/Mart-SciecPyt/ScPytone_ultrasound_processing</a>&gt;</p>
+</section>
+</section>
+<section id="transform-project-module">
+<h2>Transform Project Module<a class="headerlink" href="#transform-project-module" title="Link to this heading"></a></h2>
+<p>This module transforms a grayscale ultrasound image from polar-like geometry into a clean Cartesian projection using trilinear interpolation.</p>
+</section>
+<section id="steps">
+<h2>Steps<a class="headerlink" href="#steps" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Convert to grayscale</strong></p></li>
+<li><p><strong>Detect calibration marks</strong></p></li>
+<li><p><strong>Clean irrelevant parts of the image</strong></p></li>
+<li><p><strong>Calculate geometric parameters</strong></p></li>
+<li><p><strong>Build a Cartesian coordinate grid</strong></p></li>
+<li><p><strong>Interpolate pixel values using the coordinate grid</strong></p></li>
+</ol>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h2>
+</section>
+<section id="function-descriptions">
+<h2>Function Descriptions<a class="headerlink" href="#function-descriptions" title="Link to this heading"></a></h2>
+</section>
+<section id="convert-to-grayscale-image">
+<h2>convert_to_grayscale(image)<a class="headerlink" href="#convert-to-grayscale-image" title="Link to this heading"></a></h2>
+<p>Converts a color image to grayscale.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">image</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">PIL.Image</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">grayscale_image</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="detect-cm-marks-gray-array">
+<h2>detect_cm_marks(gray_array)<a class="headerlink" href="#detect-cm-marks-gray-array" title="Link to this heading"></a></h2>
+<p>Detects calibration marks (ruler ticks) on the image edges and calculates the scale.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">gray_array</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">d</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">float</span></code> (pixels/cm)</p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">rows</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">list[int]</span></code> — vertical tick positions</p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">cols</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">list[int]</span></code> — horizontal tick positions</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="clean-image-gray-array">
+<h2>clean_image(gray_array)<a class="headerlink" href="#clean-image-gray-array" title="Link to this heading"></a></h2>
+<p>Removes unnecessary parts and background noise from the grayscale image.</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">gray_array</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">temp</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code> — cleaned image</p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">idx</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">int</span></code> — starting row index of relevant content</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="calculate-geometry-temp-d-alpha">
+<h2>calculate_geometry(temp, d, alpha)<a class="headerlink" href="#calculate-geometry-temp-d-alpha" title="Link to this heading"></a></h2>
+<p>Calculates physical and pixel-based dimensions from calibration and image structure.</p>
+<section id="id5">
+<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">temp</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">d</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">float</span></code> — pixels per cm</p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">alpha</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">float</span></code> — angle in radians</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">offset_px</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">r_px</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">offset_cm</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">r_cm</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">first</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">int</span></code> — top row index of target area</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="compute-coordinate-grid-offset-cm-r-cm-d-temp-offset-px-first-alpha-deg-res">
+<h2>compute_coordinate_grid(offset_cm, r_cm, d, temp, offset_px, first, alpha_deg, res)<a class="headerlink" href="#compute-coordinate-grid-offset-cm-r-cm-d-temp-offset-px-first-alpha-deg-res" title="Link to this heading"></a></h2>
+<p>Builds a 2D polar-to-Cartesian coordinate grid for interpolation.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">offset_cm</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">r_cm</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">d</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">temp</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">offset_px</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">first</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">alpha_deg</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">res</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">X</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">Y</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="trilinear-interpolation-x-y-temp">
+<h2>trilinear_interpolation(X, Y, temp)<a class="headerlink" href="#trilinear-interpolation-x-y-temp" title="Link to this heading"></a></h2>
+<p>Interpolates grayscale intensity values on a transformed coordinate grid.</p>
+<section id="id9">
+<h3>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">X</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code> — X coordinates</p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">Y</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code> — Y coordinates</p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">temp</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code> — cleaned image</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h3>Returns<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">intensity</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code> — interpolated image</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="transform-path-alpha-deg-res">
+<h2>transform(path, alpha_deg, res)<a class="headerlink" href="#transform-path-alpha-deg-res" title="Link to this heading"></a></h2>
+<p>Main transformation pipeline: loads image, detects scale, cleans image, transforms coordinates, and interpolates.</p>
+<section id="id11">
+<h3>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">path</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">alpha_deg</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">res</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h3>Returns<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">intensity</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">depth</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">offset_cm</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="masking-module">
+<h2>Masking Module<a class="headerlink" href="#masking-module" title="Link to this heading"></a></h2>
+<p>This module detects the contour of the desired object within ultrasound images—in our case ships—and cleans point cloud data.</p>
+<p>Steps
+—</p>
+<ol class="arabic simple">
+<li><p><strong>Setting the threshold</strong></p></li>
+<li><p><strong>Removing noise</strong></p></li>
+<li><p><strong>Selecting first bright pixel exceeding the threshold in each column</strong></p></li>
+<li><p><strong>Contour Dilation</strong></p></li>
+</ol>
+</section>
+<section id="id13">
+<h2>Functions<a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+</section>
+<section id="mask-image-top-percent-0-93-top-margin-5-apply-closing-true">
+<h2>mask(image, top_percent=0.93, top_margin=5, apply_closing=True)<a class="headerlink" href="#mask-image-top-percent-0-93-top-margin-5-apply-closing-true" title="Link to this heading"></a></h2>
+<section id="id14">
+<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">image</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">top_percent</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">float</span></code>, default=0.93</p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">top_margin</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">int</span></code>, default=5</p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">apply_closing</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">bool</span></code>, default=True</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">masked_image</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="transform-back-project-module">
+<h2>Transform Back Project Module<a class="headerlink" href="#transform-back-project-module" title="Link to this heading"></a></h2>
+<p>This module transforms polar ultrasound-like images into Cartesian form using trilinear interpolation.</p>
+</section>
+<section id="id16">
+<h2>Steps<a class="headerlink" href="#id16" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Load grayscale data</strong></p></li>
+<li><p><strong>Convert from polar to Cartesian coordinates</strong></p></li>
+<li><p><strong>Build a grid over the Cartesian space</strong></p></li>
+<li><p><strong>Filter valid regions</strong></p></li>
+<li><p><strong>Interpolate pixel intensities</strong></p></li>
+</ol>
+</section>
+<section id="functions-and-classes">
+<h2>Functions and Classes<a class="headerlink" href="#functions-and-classes" title="Link to this heading"></a></h2>
+</section>
+<section id="id17">
+<h2>Function Descriptions<a class="headerlink" href="#id17" title="Link to this heading"></a></h2>
+</section>
+<section id="volumetransformer">
+<h2>VolumeTransformer<a class="headerlink" href="#volumetransformer" title="Link to this heading"></a></h2>
+<p>A class to manage coordinate transformations and interpolation.</p>
+<p><strong>__init__(frame_width, frame_depth, depth, thetas, offset, resolution, straighten_volume=False)</strong></p>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">frame_width</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">int</span></code> — Width of input image in pixels</p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">frame_depth</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">int</span></code> — Height of input image in pixels</p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">depth</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">float</span></code> — Physical scan depth</p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">thetas</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">tuple[float,</span> <span class="pre">float]</span></code> — Angular range in radians</p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">offset</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">float</span></code> — Vertical offset from transducer origo</p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">resolution</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">float</span></code> — Physical resolution (units/pixel)</p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">straighten_volume</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">bool</span></code> — Whether to center the angular range (default: False)</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="transform-spherical-to-cartesian-r-theta">
+<h2>transform_spherical_to_cartesian(R, THETA)<a class="headerlink" href="#transform-spherical-to-cartesian-r-theta" title="Link to this heading"></a></h2>
+<p>Converts polar coordinates to Cartesian space.</p>
+<section id="id19">
+<h3>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">R</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">THETA</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h3>Returns<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">X</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">Z</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="transform-cartesian-to-spherical-x-z">
+<h2>transform_cartesian_to_spherical(X, Z)<a class="headerlink" href="#transform-cartesian-to-spherical-x-z" title="Link to this heading"></a></h2>
+<p>Converts Cartesian coordinates to polar.</p>
+<section id="id21">
+<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">X</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">Z</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="id22">
+<h3>Returns<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">R</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">THETA</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="create-image-volume">
+<h2>create_image_volume()<a class="headerlink" href="#create-image-volume" title="Link to this heading"></a></h2>
+<p>Creates coordinate grids and masks invalid regions based on geometry.</p>
+<section id="id23">
+<h3>Parameters<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id24">
+<h3>Returns<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<p>None</p>
+</section>
+</section>
+<section id="find-nearest">
+<h2>find_nearest()<a class="headerlink" href="#find-nearest" title="Link to this heading"></a></h2>
+<p>Computes neighboring indices and weights for interpolation.</p>
+<section id="id25">
+<h3>Parameters<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<p>None</p>
+</section>
+<section id="id26">
+<h3>Returns<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<p>None</p>
+</section>
+</section>
+<section id="trilinear-interpolation-frame">
+<h2>trilinear_interpolation(frame)<a class="headerlink" href="#trilinear-interpolation-frame" title="Link to this heading"></a></h2>
+<p>Performs interpolation using surrounding data points.</p>
+<section id="id27">
+<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">frame</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code> — Input 2D image</p>
+</dd>
+</dl>
+</section>
+<section id="id28">
+<h3>Returns<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">interpolated_frame</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="interp-img-frame-depth-alpha-offset-frame-offset-0-resolution-0-01">
+<h2>interp_img(frame, depth, alpha, offset_frame, offset=0, resolution=0.01)<a class="headerlink" href="#interp-img-frame-depth-alpha-offset-frame-offset-0-resolution-0-01" title="Link to this heading"></a></h2>
+<p>Main function to interpolate an image.</p>
+<section id="id29">
+<h3>Parameters<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">frame</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">depth</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">alpha</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">offset_frame</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">offset</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">float</span></code>, default=0</p>
+</dd>
+<dt class="field-even"><code class="docutils literal notranslate"><span class="pre">resolution</span></code><span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">float</span></code>, default=0.01</p>
+</dd>
+</dl>
+</section>
+<section id="id30">
+<h3>Returns<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
+<dl class="field-list simple">
+<dt class="field-odd"><code class="docutils literal notranslate"><span class="pre">interpolated_image</span></code><span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

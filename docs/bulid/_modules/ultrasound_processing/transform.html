@@ -1,0 +1,336 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ultrasound_processing.transform &mdash; Ultrasound Processing  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Ultrasound Processing
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">“Modules”</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../transform.html">Transform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mask.html">Masking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../transform_back.html">Transforming back</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Ultrasound Processing</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ultrasound_processing.transform</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ultrasound_processing.transform</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.signal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">m</span>
+
+<div class="viewcode-block" id="convert_to_grayscale">
+<a class="viewcode-back" href="../../transform.html#ultrasound_processing.transform.convert_to_grayscale">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_to_grayscale</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts a PIL image to a grayscale NumPy array.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image (PIL.Image.Image): Input image in PIL.Image format.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: Grayscale image as a 2D NumPy array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;L&quot;</span><span class="p">))</span></div>
+
+
+
+
+<div class="viewcode-block" id="detect_cm_marks">
+<a class="viewcode-back" href="../../transform.html#ultrasound_processing.transform.detect_cm_marks">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">detect_cm_marks</span><span class="p">(</span><span class="n">gray_array</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Detects centimeter marks in the grayscale image along rows and columns.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gray_array (np.ndarray): Grayscale image array.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[float, List[int], List[int]]: </span>
+<span class="sd">            - Estimated distance in pixels between cm marks (float).</span>
+<span class="sd">            - List of detected row indices (List[int]).</span>
+<span class="sd">            - List of detected column indices (List[int]).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">find</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+        <span class="n">marks</span><span class="p">,</span> <span class="n">prev</span> <span class="o">=</span> <span class="p">[],</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="n">curr</span> <span class="o">=</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">10</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">marks</span><span class="p">:</span> <span class="n">dist</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="n">marks</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">10</span>
+            <span class="k">if</span> <span class="n">curr</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">prev</span> <span class="ow">and</span> <span class="n">dist</span><span class="p">:</span>
+                <span class="n">marks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> 
+            <span class="n">prev</span> <span class="o">=</span> <span class="n">curr</span>
+        <span class="k">return</span> <span class="n">marks</span>
+    
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">find</span><span class="p">(</span><span class="n">gray_array</span><span class="p">[:,</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">find</span><span class="p">(</span><span class="n">gray_array</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="p">((</span><span class="n">rows</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">rows</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">d</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span></div>
+
+
+
+
+<div class="viewcode-block" id="clean_image">
+<a class="viewcode-back" href="../../transform.html#ultrasound_processing.transform.clean_image">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">clean_image</span><span class="p">(</span><span class="n">gray_array</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cleans the grayscale image by cropping and filtering pixel values.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gray_array (np.ndarray): Grayscale image array.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[np.ndarray, int]: </span>
+<span class="sd">            - Processed image as a float array with noise filtered.</span>
+<span class="sd">            - Index of the first row retained after cropping.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">gray_array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">500</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">gray_array</span><span class="p">[</span><span class="n">idx</span><span class="p">:,</span> <span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">img</span><span class="p">[(</span><span class="n">img</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">img</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">img</span><span class="p">[:</span><span class="mi">100</span><span class="p">,:</span><span class="mi">100</span><span class="p">],</span> <span class="n">img</span><span class="p">[:</span><span class="mi">100</span><span class="p">,</span><span class="o">-</span><span class="mi">100</span><span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="n">img</span><span class="p">,</span> <span class="n">idx</span></div>
+
+
+
+
+<div class="viewcode-block" id="calculate_geometry">
+<a class="viewcode-back" href="../../transform.html#ultrasound_processing.transform.calculate_geometry">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_geometry</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates geometric parameters from the ultrasound image.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        temp (np.ndarray): Cleaned image array.</span>
+<span class="sd">        d (float): Pixel-to-centimeter ratio.</span>
+<span class="sd">        alpha (float): Half angle of the ultrasound beam in radians.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[float, int, float, float, int]: </span>
+<span class="sd">            - Depth of the offset in pixels.</span>
+<span class="sd">            - Height in pixels of the ultrasound window.</span>
+<span class="sd">            - Offset in centimeters.</span>
+<span class="sd">            - Height in centimeters of the ultrasound window.</span>
+<span class="sd">            - First row index of the window.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">peaks</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">find_peaks</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="n">row</span><span class="p">],</span> <span class="n">distance</span><span class="o">=</span><span class="mi">50</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">cln</span> <span class="o">=</span> <span class="n">peaks</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">peaks</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">/</span> <span class="mi">5</span><span class="p">]</span>
+    <span class="n">d_cm</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">cln</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">cln</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">)</span>
+    <span class="n">offset_cm</span> <span class="o">=</span> <span class="n">d_cm</span> <span class="o">/</span> <span class="n">m</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">temp</span><span class="p">[:,</span> <span class="nb">int</span><span class="p">(</span><span class="n">cln</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">cln</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">cln</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">offset_cm</span> <span class="o">*</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">offset_cm</span><span class="p">,</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">d</span><span class="p">,</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="compute_coordinate_grid">
+<a class="viewcode-back" href="../../transform.html#ultrasound_processing.transform.compute_coordinate_grid">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_coordinate_grid</span><span class="p">(</span><span class="n">offset_cm</span><span class="p">,</span> <span class="n">r_cm</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">offset_px</span><span class="p">,</span> <span class="n">first</span><span class="p">,</span> <span class="n">alpha_deg</span><span class="p">,</span> <span class="n">res</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the coordinate grid for the ultrasound image transformation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        offset_cm (float): Offset in centimeters.</span>
+<span class="sd">        r_cm (float): Range in centimeters.</span>
+<span class="sd">        d (float): Pixel-to-centimeter ratio.</span>
+<span class="sd">        temp (np.ndarray): Processed grayscale image.</span>
+<span class="sd">        offset_px (float): Offset in pixels.</span>
+<span class="sd">        first (int): Index of the first pixel row used.</span>
+<span class="sd">        alpha_deg (float): Half angle of ultrasound beam in degrees.</span>
+<span class="sd">        res (float): Image resolution scaling factor.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[np.ndarray, np.ndarray]: </span>
+<span class="sd">            - X coordinates in the transformed space.</span>
+<span class="sd">            - Y coordinates in the transformed space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">offset_cm</span><span class="o">*</span><span class="n">res</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">offset_cm</span><span class="o">*</span><span class="n">res</span> <span class="o">+</span> <span class="n">r_cm</span><span class="o">*</span><span class="n">res</span><span class="p">))[:,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">alpha_deg</span><span class="p">,</span> <span class="n">alpha_deg</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
+    <span class="n">Th</span> <span class="o">=</span> <span class="n">cols</span> <span class="o">*</span> <span class="n">m</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">Th</span><span class="p">)</span> <span class="o">*</span> <span class="n">rows</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">Th</span><span class="p">)</span> <span class="o">*</span> <span class="n">rows</span>
+
+    <span class="k">return</span> <span class="n">X</span> <span class="o">/</span> <span class="n">res</span> <span class="o">*</span> <span class="n">d</span> <span class="o">+</span> <span class="n">temp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">Y</span> <span class="o">/</span> <span class="n">res</span> <span class="o">*</span> <span class="n">d</span> <span class="o">-</span> <span class="p">(</span><span class="n">offset_px</span> <span class="o">-</span> <span class="n">first</span><span class="p">)</span></div>
+
+
+
+
+<div class="viewcode-block" id="interpolate_image">
+<a class="viewcode-back" href="../../transform.html#ultrasound_processing.transform.interpolate_image">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">interpolate_image</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">temp</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies bilinear interpolation to map intensity values from input coordinates.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        X (np.ndarray): X coordinate grid.</span>
+<span class="sd">        Y (np.ndarray): Y coordinate grid.</span>
+<span class="sd">        temp (np.ndarray): Processed grayscale image.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: Interpolated intensity values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">temp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">temp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">Xl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">Xr</span> <span class="o">=</span> <span class="n">Xl</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">Yt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">Yb</span> <span class="o">=</span> <span class="n">Yt</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">X</span> <span class="o">-</span> <span class="n">Xl</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">Y</span> <span class="o">-</span> <span class="n">Yt</span>
+
+    <span class="n">intensity</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">dx</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">dy</span><span class="p">)</span> <span class="o">*</span> <span class="n">temp</span><span class="p">[</span><span class="n">Yt</span><span class="p">,</span> <span class="n">Xl</span><span class="p">]</span> <span class="o">+</span>
+        <span class="p">(</span><span class="n">dx</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">dy</span><span class="p">))</span> <span class="o">*</span> <span class="n">temp</span><span class="p">[</span><span class="n">Yt</span><span class="p">,</span> <span class="n">Xr</span><span class="p">]</span> <span class="o">+</span>
+        <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">dx</span><span class="p">)</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">temp</span><span class="p">[</span><span class="n">Yb</span><span class="p">,</span> <span class="n">Xl</span><span class="p">]</span> <span class="o">+</span>
+        <span class="p">(</span><span class="n">dx</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span> <span class="o">*</span> <span class="n">temp</span><span class="p">[</span><span class="n">Yb</span><span class="p">,</span> <span class="n">Xr</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">intensity</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="transform_image">
+<a class="viewcode-back" href="../../transform.html#ultrasound_processing.transform.transform_image">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">transform_image</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="s1">&#39;PIL.Image.Image&#39;</span><span class="p">,</span> <span class="n">alpha_deg</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>    
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transforms an ultrasound image into a rectified coordinate system.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        img (PIL.Image.Image): Input image to process.</span>
+<span class="sd">        alpha_deg (float): Half angle of the ultrasound beam in degrees.</span>
+<span class="sd">        res (float): Image resolution scaling factor.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[np.ndarray, float, float]: </span>
+<span class="sd">            - Transformed image as a 2D array.</span>
+<span class="sd">            - Depth of the ultrasound window in pixels.</span>
+<span class="sd">            - Offset from the top in centimeters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+        
+    <span class="n">gray</span> <span class="o">=</span> <span class="n">convert_to_grayscale</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="n">d</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">detect_cm_marks</span><span class="p">(</span><span class="n">gray</span><span class="p">)</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha_deg</span><span class="o">/</span><span class="mi">180</span><span class="o">*</span><span class="n">m</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">temp</span><span class="p">,</span> <span class="n">gray_idx</span> <span class="o">=</span> <span class="n">clean_image</span><span class="p">(</span><span class="n">gray</span><span class="p">)</span>
+    <span class="n">offset_px</span><span class="p">,</span> <span class="n">r_px</span><span class="p">,</span> <span class="n">offset_cm</span><span class="p">,</span> <span class="n">r_cm</span><span class="p">,</span> <span class="n">first</span> <span class="o">=</span> <span class="n">calculate_geometry</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">compute_coordinate_grid</span><span class="p">(</span><span class="n">offset_cm</span><span class="p">,</span> <span class="n">r_cm</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">temp</span><span class="p">,</span> <span class="n">offset_px</span><span class="p">,</span> <span class="n">first</span><span class="p">,</span> <span class="n">alpha_deg</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+    <span class="n">intensity</span> <span class="o">=</span> <span class="n">interpolate_image</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">temp</span><span class="p">)</span>
+
+    <span class="n">depth</span> <span class="o">=</span> <span class="n">r_px</span> <span class="o">/</span> <span class="n">d</span>
+
+    <span class="k">return</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">offset_cm</span></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

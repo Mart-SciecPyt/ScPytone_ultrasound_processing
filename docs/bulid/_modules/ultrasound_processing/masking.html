@@ -1,0 +1,295 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ultrasound_processing.masking &mdash; Ultrasound Processing  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Ultrasound Processing
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">“Modules”</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../transform.html">Transform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mask.html">Masking</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../transform_back.html">Transforming back</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Ultrasound Processing</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ultrasound_processing.masking</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ultrasound_processing.masking</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
+
+
+<div class="viewcode-block" id="compute_threshold">
+<a class="viewcode-back" href="../../mask.html#ultrasound_processing.masking.compute_threshold">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_threshold</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">top_percent</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the intensity threshold such that the top top_percent fraction of pixel values</span>
+<span class="sd">    in the grayscale image will be set to white in the binary mask.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image: 2D numpy array of grayscale pixel intensities (0-255).</span>
+<span class="sd">        top_percent: Number between 0 and 1 that determines the fraction of pixels to be set to white.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        An integer threshold value in the range [0, 255].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">hist</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">256</span><span class="p">])</span>
+    <span class="n">cdf</span> <span class="o">=</span> <span class="n">hist</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+    <span class="n">cdf_normalized</span> <span class="o">=</span> <span class="n">cdf</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">cdf</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cdf_normalized</span> <span class="o">&gt;=</span> <span class="n">top_percent</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">idx</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">255</span></div>
+
+
+<div class="viewcode-block" id="threshold_mask">
+<a class="viewcode-back" href="../../mask.html#ultrasound_processing.masking.threshold_mask">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">threshold_mask</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">threshold_value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a binary mask by thresholding the image: pixels with intensity &gt;= threshold_value</span>
+<span class="sd">    become 255 (white), others become 0 (black).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image: 2D numpy array of grayscale pixel intensities.</span>
+<span class="sd">        threshold_value: Intensity cutoff for binarization.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A binary mask as a 2D numpy array of 0s and 255s.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">image</span> <span class="o">&gt;=</span> <span class="n">threshold_value</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span></div>
+
+
+
+<div class="viewcode-block" id="do_closing">
+<a class="viewcode-back" href="../../mask.html#ultrasound_processing.masking.do_closing">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">do_closing</span><span class="p">(</span><span class="n">mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply a morphological closing operation (dilation followed by erosion) to fill small holes</span>
+<span class="sd">    and connect nearby white regions in the binary mask.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mask: Binary mask (0 or 255) to be processed.</span>
+<span class="sd">        kernel_size: Size of the structuring element used for closing.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The mask after morphological closing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">kernel</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getStructuringElement</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_ELLIPSE</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">morphologyEx</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_CLOSE</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="remove_small_components">
+<a class="viewcode-back" href="../../mask.html#ultrasound_processing.masking.remove_small_components">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_small_components</span><span class="p">(</span><span class="n">mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">top_margin</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Remove white components (noise) from the top part of the image.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mask: Binary mask (0 or 255) (after closing).</span>
+<span class="sd">        top_margin: Number of pixels from the top; any component starting above this</span>
+<span class="sd">                    line will be removed.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The mask with small top components removed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">num_labels</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">connectedComponentsWithStats</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">connectivity</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_labels</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">area</span> <span class="o">=</span> <span class="n">stats</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">top_margin</span><span class="p">:</span>
+            <span class="n">mask</span><span class="p">[</span><span class="n">labels</span> <span class="o">==</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">mask</span></div>
+
+
+<div class="viewcode-block" id="extract_top_contour">
+<a class="viewcode-back" href="../../mask.html#ultrasound_processing.masking.extract_top_contour">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_top_contour</span><span class="p">(</span><span class="n">mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract the top contour of the white regions in the binary mask by keeping only the first</span>
+<span class="sd">    white pixel in each column.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mask: Cleaned binary mask (0 or 255).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A binary image where each column has at most one white pixel.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">contour</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
+        <span class="n">white</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">[:,</span> <span class="n">col</span><span class="p">]</span> <span class="o">==</span> <span class="mi">255</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">white</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">contour</span><span class="p">[</span><span class="n">white</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="mi">255</span>
+    <span class="k">return</span> <span class="n">contour</span></div>
+
+
+<div class="viewcode-block" id="dilate_contour">
+<a class="viewcode-back" href="../../mask.html#ultrasound_processing.masking.dilate_contour">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dilate_contour</span><span class="p">(</span><span class="n">contour</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                   <span class="n">kernel_size</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+                   <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Thicken the one- pixel-wide contour by applying dilation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        contour: Binary contour image (0 or 255) with single-pixel lines.</span>
+<span class="sd">        kernel_size: Size of the rectangular structuring element.</span>
+<span class="sd">        iterations: Number of dilation iterations.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The dilated contour mask.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">kernel</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getStructuringElement</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_RECT</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">dilate</span><span class="p">(</span><span class="n">contour</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="n">iterations</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="smooth_mask">
+<a class="viewcode-back" href="../../mask.html#ultrasound_processing.masking.smooth_mask">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">smooth_mask</span><span class="p">(</span><span class="n">dilated</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                <span class="n">blur_ksize</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply a Gaussian blur to the dilated contour mask.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dilated: Dilated binary contour mask.</span>
+<span class="sd">        blur_ksize: Kernel size for Gaussian blur.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A smooth mask with values in [0, 255].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">blurred</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">GaussianBlur</span><span class="p">(</span><span class="n">dilated</span><span class="p">,</span> <span class="n">blur_ksize</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">blurred</span><span class="p">[</span><span class="n">dilated</span> <span class="o">==</span> <span class="mi">255</span><span class="p">]</span> <span class="o">=</span> <span class="mi">255</span>
+    <span class="k">return</span> <span class="n">blurred</span></div>
+
+
+<div class="viewcode-block" id="original_intensity_mask">
+<a class="viewcode-back" href="../../mask.html#ultrasound_processing.masking.original_intensity_mask">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">original_intensity_mask</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">smooth</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Preserve the original grayscale intensities.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image: Original 2D grayscale image.</span>
+<span class="sd">        smooth: Smooth mask with values in [0, 255].</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Masked image where the contour regions preserve their original intensities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">smooth</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.0</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">*</span> <span class="n">norm</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span></div>
+
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mask</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+          <span class="n">top_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.93</span><span class="p">,</span>
+          <span class="n">top_margin</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+          <span class="n">apply_closing_flag</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Complete pipeline that generates a masked ultrasound image that keeps only the contour of a certain object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image: Input 2D grayscale image.</span>
+<span class="sd">        top_percent: Fraction of pixels to threshold as white (default 0.93).</span>
+<span class="sd">        top_margin: Pixel row margin to remove top noise components (default 5).</span>
+<span class="sd">        apply_closing_flag: Whether to perform morphological closing (default True).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A grayscale image where only the contour region retains its original intensities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">th</span> <span class="o">=</span> <span class="n">compute_threshold</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">top_percent</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">threshold_mask</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">th</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">apply_closing_flag</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">do_closing</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">remove_small_components</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">top_margin</span><span class="p">)</span>
+    <span class="n">contour</span> <span class="o">=</span> <span class="n">extract_top_contour</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+    <span class="n">dilated</span> <span class="o">=</span> <span class="n">dilate_contour</span><span class="p">(</span><span class="n">contour</span><span class="p">)</span>
+    <span class="n">smooth</span> <span class="o">=</span> <span class="n">smooth_mask</span><span class="p">(</span><span class="n">dilated</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">original_intensity_mask</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">smooth</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -5,29 +5,29 @@ Ultrasound Processing Package
 
 
 Description
-===========
+--------------
 
 1. Preprocessing and Transforming Images
-----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In this module we are preprocessing the image and we transform it to a “flat” format which is easier to work with at the filtering part. We convert the input image to grayscale and detect centimeter calibration marks along both axes. The image is then cleaned by removing irrelevant top and side regions and suppressing extreme pixel values. Based on peak detection, the module estimates the geometric parameters of the scan area and transducer settings, such as the offset and scanning depth. Using trigonometric relations, it constructs a polar-to-Cartesian grid. We use trilinear interpolation to project the image onto a uniform Cartesian space for the filtering part.
 
 2. Filtering of the Ultrasound Images
--------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In this module, we first generate a binary mask by thresholding the input image: pixels with intensity at or above the specified threshold are set to white (255), and those below are set to black (0). After removing noise components, we scan each column to select the very first pixel whose intensity exceeds the threshold, building an initial contour mask. Next, we apply OpenCV’s functions to thicken that contour for clear visualization. Finally, we apply the dilated contour as a mask to preserve and display the original pixel intensities. 
 
 3. Backtransformation
----------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In this module we define a class to reverse the transformation process, converting polar image data back into Cartesian coordinates. It first initializes key transformation parameters and builds a 3D volume grid using spherical coordinates. The grid is filtered to exclude regions outside the cone of interest. It finds the nearest original coordinates for each point and assigns interpolation weights. The main function performs trilinear interpolation to fill in the back-projected image using these weights.
 
 
 Usage
-=====
+----------
 
 1. Installation
----------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To install:
 
@@ -40,7 +40,7 @@ pip install ultrasound-processing
 Make sure to set the proper paths to the files.
 
 2. Example
-----------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 *Hyperlinked notebook:*  
@@ -51,12 +51,12 @@ Make sure to set the proper paths to the files.
 
 
 Transform Project Module
-========================
+------------------------
 
 This module transforms a grayscale ultrasound image from polar-like geometry into a clean Cartesian projection using trilinear interpolation.
 
 Steps
-=====
+-----
 
 #. **Convert to grayscale**  
 #. **Detect calibration marks**  
@@ -218,12 +218,12 @@ Returns
 
 
 Masking Module
-==============
+----------------
 
 This module detects the contour of the desired object within ultrasound images—in our case ships—and cleans point cloud data.
 
 Steps
-=====
+---
 
 #. **Setting the threshold**  
 #. **Removing noise**  
@@ -255,12 +255,12 @@ Returns
 
 
 Transform Back Project Module
-=============================
+-----------------------------
 
 This module transforms polar ultrasound-like images into Cartesian form using trilinear interpolation.
 
 Steps
-=====
+-----
 
 #. **Load grayscale data**
 #. **Convert from polar to Cartesian coordinates**

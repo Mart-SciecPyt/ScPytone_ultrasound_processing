@@ -1,5 +1,5 @@
 import ultrasound_processing.masking as masking
-import ultrasound_processing.transform_project as transform_project
-import ultrasound_processing.transform_back_project as transform_back_project
+import ultrasound_processing.transform as transform
+import ultrasound_processing.transform_back as transform_back
 
 print("Sikeresen betöltötted az ultrasound_processing_package-t!")
